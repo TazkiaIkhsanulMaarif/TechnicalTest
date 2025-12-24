@@ -12,7 +12,15 @@ namespace CardGame.Models.Cards
         [Header("Trap Info")]
         [SerializeField] private TrapTriggerType triggerType;
 
+        [Header("Effect")]
+        [SerializeField] private TrapEffectType effectType;
+
+        [Tooltip("Generic numeric parameter used by the selected effect (e.g. damage amount or ATK percentage).")]
+        [SerializeField] private int effectValue;
+
         public TrapTriggerType TriggerType => triggerType;
+        public TrapEffectType EffectType => effectType;
+        public int EffectValue => effectValue;
 
         private void OnEnable()
         {

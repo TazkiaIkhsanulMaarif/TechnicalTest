@@ -12,7 +12,15 @@ namespace CardGame.Models.Cards
         [Header("Spell Info")]
         [SerializeField] private SpellType spellType;
 
+        [Header("Effect")]
+        [SerializeField] private SpellEffectType effectType;
+
+        [Tooltip("Generic numeric parameter used by the selected effect (e.g. ATK threshold or percentage).")]
+        [SerializeField] private int effectValue;
+
         public SpellType SpellType => spellType;
+        public SpellEffectType EffectType => effectType;
+        public int EffectValue => effectValue;
 
         private void OnEnable()
         {

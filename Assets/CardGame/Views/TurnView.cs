@@ -27,6 +27,8 @@ namespace CardGame.Views
 
         private TurnController controller;
 
+        public TurnPhase CurrentPhase => controller != null ? controller.CurrentPhase : TurnPhase.Draw;
+
         private void Awake()
         {
             var model = new TurnModel(playerCount);
@@ -58,19 +60,28 @@ namespace CardGame.Views
 
         private void HandleGameStarted()
         {
+            Debug.Log("[TURN] Game Started");
             onGameStarted?.Invoke();
         }
 
         private void HandleTurnSwitched(int currentPlayerIndex)
         {
+            int playerNumber = currentPlayerIndex + 1;
+            Debug.Log($"[TURN] Switched to Player {playerNumber}");
             onTurnSwitched?.Invoke(currentPlayerIndex);
         }
 
         private void HandlePhaseChanged(TurnPhase phase)
         {
+            int playerNumber = controller != null ? controller.CurrentPlayerIndex + 1 : -1;
+
+            // Main phase flow log: Player X + phase name
+            Debug.Log($"[TURN] Player {playerNumber} - {phase}");
+
             switch (phase)
             {
                 case TurnPhase.Draw:
+                    ResetTurnStateForCurrentPlayer();
                     onDrawPhase?.Invoke();
                     DrawForCurrentPlayer();
                     break;
@@ -86,6 +97,30 @@ namespace CardGame.Views
             }
 
             HandleAIForCurrentPlayer(phase);
+        }
+
+        private void ResetTurnStateForCurrentPlayer()
+        {
+            if (controller == null)
+                return;
+
+            int index = controller.CurrentPlayerIndex;
+
+            if (playerDecks == null || index < 0 || index >= playerDecks.Length)
+            {
+                Debug.LogWarning($"No deck assigned for player index {index} in TurnView when resetting turn state.");
+                return;
+            }
+
+            GameManager deck = playerDecks[index];
+
+            if (deck == null)
+            {
+                Debug.LogWarning($"GameManager is null for player index {index} when resetting turn state.");
+                return;
+            }
+
+            deck.ResetTurnState();
         }
 
         private void DrawForCurrentPlayer()
@@ -109,6 +144,7 @@ namespace CardGame.Views
                 return;
             }
 
+            Debug.Log($"[TURN] Player {index + 1} draws a card");
             deck.DrawOneCard();
         }
 

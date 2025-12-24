@@ -68,7 +68,7 @@ namespace CardGame.Views
             if (lifePointText != null)
                 lifePointText.text = lifePoint.ToString();
 
-            Debug.Log(lifePointText);
+            Debug.Log(lifePoint.ToString());
             // onDamageTaken?.Invoke();
         }
 

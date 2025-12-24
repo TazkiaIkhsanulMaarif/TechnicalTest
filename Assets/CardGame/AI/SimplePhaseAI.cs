@@ -15,19 +15,21 @@ namespace CardGame.AI
             if (self == null)
                 return;
 
+            string label = self.DebugLabel;
+
             switch (phase)
             {
                 case TurnPhase.Main:
-                    PerformMainPhaseActions(self);
+                    PerformMainPhaseActions(self, label);
                     break;
                 case TurnPhase.Battle:
-                    PerformBattlePhaseActions(self, opponent);
+                    PerformBattlePhaseActions(self, opponent, label);
                     break;
                     // Draw and End: no active decision for this simple AI
             }
         }
 
-        private static void PerformMainPhaseActions(PlayerController controller)
+        private static void PerformMainPhaseActions(PlayerController controller, string label)
         {
             PlayerModel model = controller.Player.Model;
 
@@ -47,36 +49,34 @@ namespace CardGame.AI
 
             if (bestMonster != null)
             {
-                int emptyMonsterSlot = -1;
-                var monsterField = model.MonsterField;
-                for (int i = 0; i < monsterField.Count; i++)
+                UnityEngine.Debug.Log($"[AI][{label}] Main: Try summon monster '{bestMonster.CardName}' with ATK {bestMonster.Attack}.");
+                // Use controller's SummonMonster, which enforces
+                // 1 normal summon per turn, level restriction and field size.
+                bool summoned = controller.SummonMonster(bestMonster);
+                if (!summoned)
                 {
-                    if (monsterField[i] == null)
-                    {
-                        emptyMonsterSlot = i;
-                        break;
-                    }
-                }
-
-                if (emptyMonsterSlot != -1)
-                {
-                    controller.PlayCard(bestMonster, emptyMonsterSlot);
+                    UnityEngine.Debug.Log($"[AI][{label}] Main: Summon of '{bestMonster.CardName}' was rejected (see [ACTION][{label}.SUMMON] logs).");
                 }
             }
+            else
+            {
+                UnityEngine.Debug.Log($"[AI][{label}] Main: No monster in hand to summon.");
+            }
 
-            // 2) Use first spell card (buff) to first empty spell/trap slot
+            // 2) Use at most one spell per turn: pick first useful spell card
             CardBase spellCard = null;
             foreach (CardBase card in model.Hand)
             {
-                if (card.CardType == CardType.Spell)
+                if (card is SpellCard spell)
                 {
-                    spellCard = card;
+                    spellCard = spell;
                     break;
                 }
             }
 
             if (spellCard != null)
             {
+                // Enforce "1 spell per turn" at AI level: just cast one if conditions allow
                 int emptySpellSlot = -1;
                 var spellField = model.SpellTrapField;
                 for (int i = 0; i < spellField.Count; i++)
@@ -90,12 +90,21 @@ namespace CardGame.AI
 
                 if (emptySpellSlot != -1)
                 {
+                    UnityEngine.Debug.Log($"[AI][{label}] Main: Play spell '{spellCard.CardName}' to slot {emptySpellSlot} (1 spell/turn rule).");
                     controller.PlayCard(spellCard, emptySpellSlot);
                 }
+                else
+                {
+                    UnityEngine.Debug.Log($"[AI][{label}] Main: Has spell '{spellCard.CardName}' but no empty spell/trap slot.");
+                }
+            }
+            else
+            {
+                UnityEngine.Debug.Log($"[AI][{label}] Main: No spell card in hand.");
             }
         }
 
-        private static void PerformBattlePhaseActions(PlayerController selfController, PlayerController opponentController)
+        private static void PerformBattlePhaseActions(PlayerController selfController, PlayerController opponentController, string label)
         {
             if (opponentController == null)
                 return;
@@ -120,7 +129,10 @@ namespace CardGame.AI
             }
 
             if (attackerSlot == -1)
+            {
+                UnityEngine.Debug.Log($"[AI][{label}] Battle: No monsters to attack with.");
                 return; // no monsters to attack with
+            }
 
             // Find weakest enemy monster by ATK
             int targetSlot = -1;
@@ -142,6 +154,11 @@ namespace CardGame.AI
             {
                 // No enemy monsters: direct attack to first slot index (0)
                 targetSlot = 0;
+                UnityEngine.Debug.Log($"[AI][{label}] Battle: Direct attack with '{attackerCard.CardName}' from slot {attackerSlot} (opponent has no monsters).");
+            }
+            else
+            {
+                UnityEngine.Debug.Log($"[AI][{label}] Battle: Attack weakest enemy '{weakestDefender.CardName}' (ATK {weakestDefender.Attack}) from slot {attackerSlot}.");
             }
 
             selfController.AttackWithMonster(attackerSlot, targetSlot, opponentController);

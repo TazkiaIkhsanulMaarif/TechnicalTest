@@ -21,8 +21,14 @@ namespace CardGame.Models.Deck
 
         public DeckModel(IEnumerable<CardBase> initialCards)
         {
-            ValidateDeck(initialCards);
-            cards.AddRange(initialCards);
+            var list = initialCards?.ToList() ?? throw new ArgumentNullException(nameof(initialCards));
+
+            ValidateDeck(list);
+
+            cards.AddRange(list);
+
+            UnityEngine.Debug.Log($"[DeckModel] Created deck with {cards.Count} cards.");
+            UnityEngine.Debug.Log($"[DeckModel] Composition -> Monster={cards.Count(c => c.CardType == CardType.Monster)}, Spell={cards.Count(c => c.CardType == CardType.Spell)}, Trap={cards.Count(c => c.CardType == CardType.Trap)}");
         }
 
         private void ValidateDeck(IEnumerable<CardBase> deckCards)

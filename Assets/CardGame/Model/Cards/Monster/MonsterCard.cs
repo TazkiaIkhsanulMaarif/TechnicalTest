@@ -14,9 +14,13 @@ namespace CardGame.Models.Cards
         [SerializeField] private int attack;
         [SerializeField] private int defense;
 
+        [Header("Role (AI hint / balancing)")]
+        [SerializeField] private MonsterRole role = MonsterRole.Balanced;
+
         public int Level => level;
         public int Attack => attack;
         public int Defense => defense;
+        public MonsterRole Role => role;
 
         private void OnEnable()
         {

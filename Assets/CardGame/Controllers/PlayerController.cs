@@ -1,16 +1,20 @@
 using System;
+using System.Linq;
 using CardGame.Models.Cards;
 using CardGame.Models.Deck;
 using CardGame.Models.Player;
+using CardGame.Enums;
 
 namespace CardGame.Controllers
 {
-    public sealed class PlayerController
+    public sealed partial class PlayerController
     {
         private readonly PlayerBase player;
         private readonly DeckController deckController;
+        private readonly string debugLabel;
 
         public PlayerBase Player => player;
+        public string DebugLabel => debugLabel;
 
         public event Action HandChanged;
         public event Action<int> LifePointChanged;
@@ -18,81 +22,23 @@ namespace CardGame.Controllers
         public event Action<int, bool, CardBase> CardRemovedFromField;
         public event Action PlayerDied;
 
-        public PlayerController(PlayerBase player)
+        public PlayerController(PlayerBase player, string debugLabel)
         {
             this.player = player ?? throw new ArgumentNullException(nameof(player));
+            this.debugLabel = string.IsNullOrEmpty(debugLabel) ? "Player" : debugLabel;
 
             DeckModel deckModel = player.Model.Deck;
             if (deckModel == null)
                 throw new ArgumentException("Player model must have a deck.", nameof(player));
 
             deckController = new DeckController(deckModel);
+            UnityEngine.Debug.Log($"[PlayerController][{this.debugLabel}] Initialized with deck size={deckController.Count}.");
         }
-
-        public CardBase DrawCard()
+        public void ResetTurnState()
         {
-            if (deckController.Count <= 0)
-            {
-                PlayerDied?.Invoke();
-                return null;
-            }
-
-            CardBase card = deckController.Draw();
-            player.Model.AddToHand(card);
-
-            player.NotifyCardDrawn(card);
-            HandChanged?.Invoke();
-
-            return card;
+            player.Model.ResetTurnState();
         }
 
-        public void DrawStartingHand(int cardCount = 4)
-        {
-            for (int i = 0; i < cardCount; i++)
-            {
-                DrawCard();
-            }
-        }
-
-        public void ShuffleDeck()
-        {
-            deckController.Shuffle();
-        }
-
-        public void PlayCard(CardBase card, int slotIndex)
-        {
-            if (card == null) throw new ArgumentNullException(nameof(card));
-
-            if (!player.Model.RemoveFromHand(card))
-                throw new InvalidOperationException("Card is not in hand.");
-
-            bool isMonster = card is MonsterCard;
-
-            if (isMonster)
-            {
-                ValidateEmptySlot(player.Model.MonsterField, slotIndex);
-                player.Model.PlaceMonster(card, slotIndex);
-            }
-            else
-            {
-                ValidateEmptySlot(player.Model.SpellTrapField, slotIndex);
-                player.Model.PlaceSpellTrap(card, slotIndex);
-            }
-
-            HandChanged?.Invoke();
-            CardPlaced?.Invoke(card, slotIndex, isMonster);
-        }
-
-        public void DiscardCard(CardBase card)
-        {
-            if (card == null) throw new ArgumentNullException(nameof(card));
-
-            if (!player.Model.RemoveFromHand(card))
-                throw new InvalidOperationException("Card is not in hand.");
-
-            player.Model.AddToGraveyard(card);
-            HandChanged?.Invoke();
-        }
 
         public void TakeDamage(int damage)
         {
@@ -114,43 +60,6 @@ namespace CardGame.Controllers
             }
         }
 
-        public void AttackWithMonster(int attackerSlot, int targetSlot, PlayerController opponent)
-        {
-            if (opponent == null) throw new ArgumentNullException(nameof(opponent));
-
-            MonsterCard attacker = GetMonsterAtSlot(player.Model, attackerSlot);
-            MonsterCard defender = GetMonsterAtSlot(opponent.player.Model, targetSlot, allowNull: true);
-
-            if (attacker == null)
-                throw new InvalidOperationException("No attacker monster in the specified slot.");
-
-            if (defender == null)
-            {
-                opponent.TakeDamage(attacker.Attack);
-                return;
-            }
-
-            int attackValue = attacker.Attack;
-            int defenseValue = defender.Defense;
-
-            if (attackValue > defenseValue)
-            {
-                int damage = attackValue - defenseValue;
-                RemoveMonsterFromField(opponent.player.Model, targetSlot);
-                opponent.TakeDamage(damage);
-            }
-            else if (attackValue < defenseValue)
-            {
-                int damage = defenseValue - attackValue;
-                RemoveMonsterFromField(player.Model, attackerSlot);
-                TakeDamage(damage);
-            }
-            else
-            {
-                RemoveMonsterFromField(player.Model, attackerSlot);
-                RemoveMonsterFromField(opponent.player.Model, targetSlot);
-            }
-        }
 
         private static MonsterCard GetMonsterAtSlot(PlayerModel model, int slotIndex, bool allowNull = false)
         {
@@ -175,7 +84,25 @@ namespace CardGame.Controllers
             {
                 model.AddToGraveyard(removed);
                 CardRemovedFromField?.Invoke(slotIndex, true, removed);
+                LogAction("BATTLE", $"Monster '{removed.CardName}' destroyed and sent to graveyard (slot {slotIndex}).");
             }
+        }
+
+        private void RemoveSpellTrapFromField(PlayerModel model, int slotIndex)
+        {
+            CardBase removed = model.RemoveFromField(slotIndex, isMonster: false);
+            if (removed != null)
+            {
+                model.AddToGraveyard(removed);
+                CardRemovedFromField?.Invoke(slotIndex, false, removed);
+            }
+        }
+
+
+        private void LogAction(string action, string message)
+        {
+            // Example: [ACTION][Player 1.SUMMON] ... or [ACTION][Player 2.ATTACK] ...
+            UnityEngine.Debug.Log($"[ACTION][{debugLabel}.{action}] {message}");
         }
 
         private static void ValidateEmptySlot(System.Collections.Generic.IReadOnlyList<CardBase> field, int slotIndex)
@@ -186,5 +113,39 @@ namespace CardGame.Controllers
             if (field[slotIndex] != null)
                 throw new InvalidOperationException("Field slot is already occupied.");
         }
+
+        private static bool IsMonsterInHand(PlayerModel model, MonsterCard monster)
+        {
+            return model.Hand.Contains(monster);
+        }
+
+        private static bool TryFindEmptyMonsterSlot(System.Collections.Generic.IReadOnlyList<CardBase> field, out int slotIndex)
+        {
+            for (int i = 0; i < field.Count; i++)
+            {
+                if (field[i] == null)
+                {
+                    slotIndex = i;
+                    return true;
+                }
+            }
+
+            slotIndex = -1;
+            return false;
+        }
+
+        private static bool HasAnyMonsterOnField(PlayerModel model)
+        {
+            for (int i = 0; i < model.MonsterField.Count; i++)
+            {
+                if (model.MonsterField[i] is MonsterCard)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
     }
 }

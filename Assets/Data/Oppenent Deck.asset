@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7deb5b43fa545bd4890068bc1a48dd7e, type: 3}
+  m_Name: Oppenent Deck
+  m_EditorClassIdentifier: 
+  cards:
+  - {fileID: 11400000, guid: 9d488bd8987603640875bc170a376023, type: 2}
+  - {fileID: 11400000, guid: 0f19ad9d9a0b00649ac952eaca8aba83, type: 2}
+  - {fileID: 11400000, guid: 8aa8d4563a9e90c48a214b3b54a1b656, type: 2}
+  - {fileID: 11400000, guid: 81f616279e1b18a4884b1b6eb64d2c15, type: 2}
+  - {fileID: 11400000, guid: 132a729119b64be41bfaca72c27617cb, type: 2}
+  - {fileID: 11400000, guid: 4855dfc86068e864089cb8a0138cedb8, type: 2}
+  - {fileID: 11400000, guid: 0c6a2b2fbc35bfb4fa528cc485bcca40, type: 2}
+  - {fileID: 11400000, guid: 33838fe7af900fc41b3bbc9834bfc9c2, type: 2}
+  - {fileID: 11400000, guid: 2e6ee00aa05749847a5e04999dd0c9da, type: 2}
+  - {fileID: 11400000, guid: fde73d83437a2364f8551f8e1d106e77, type: 2}
+  - {fileID: 11400000, guid: cbd79fdedaba3e244ab2fba2cd1b15f2, type: 2}
+  - {fileID: 11400000, guid: ed0b4f8bc56f55440b52497e4cebcd9b, type: 2}
+  - {fileID: 11400000, guid: 805d4037fbc768544a59bd616db1a2de, type: 2}
+  - {fileID: 11400000, guid: 60e1b1867f4b8e94cb5f4e15016a3e7e, type: 2}
+  - {fileID: 11400000, guid: b57efa382d930bf43a2010947bf4feb6, type: 2}
+  - {fileID: 11400000, guid: cc58434a3b0c5a24eb84aab0048396cb, type: 2}
+  - {fileID: 11400000, guid: 94536f63f48c7e24e98d9d113f2e9538, type: 2}
+  - {fileID: 11400000, guid: 363078585e590074ea98404030b974f2, type: 2}
+  - {fileID: 11400000, guid: 552ccc8d04faf6c4dbae44d4a3634744, type: 2}
+  - {fileID: 11400000, guid: 3e06ee0dded469c41ab5e16b2f1f347c, type: 2}
+  monsterPrefab: {fileID: 4890379604619175810, guid: 2da4aaf0559dba243a67dbf2560d611f, type: 3}
+  spellPrefab: {fileID: 4890379604619175810, guid: 4cdb91671969cb246b3b3d21087a6f38, type: 3}
+  trapPrefab: {fileID: 4890379604619175810, guid: 2e569ea6c1237334ab0dd52678a1b36d, type: 3}

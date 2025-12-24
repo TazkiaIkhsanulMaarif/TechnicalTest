@@ -17,6 +17,9 @@ namespace CardGame.Testing
         [Header("Player View (UI + Feel)")]
         [SerializeField] private PlayerView playerView;
 
+        [Header("Debug")]
+        [SerializeField] private string playerLabel = "Player 1";
+
         [Header("AI Settings")]
         [SerializeField] private bool isAI;
         [SerializeField] private AIDifficulty aiDifficulty = AIDifficulty.Easy;
@@ -28,6 +31,8 @@ namespace CardGame.Testing
         private IAIPlayer aiLogic;
 
         public bool IsAI => isAI;
+        public PlayerController Controller => playerController;
+        public string PlayerLabel => playerLabel;
 
         private void Start()
         {
@@ -46,7 +51,8 @@ namespace CardGame.Testing
                 ? new AIPlayer(playerModel, aiDifficulty)
                 : new HumanPlayer(playerModel);
 
-            playerController = new PlayerController(playerBase);
+            // Pass a label ("Player 1", "Player 2", etc.) for debug logging
+            playerController = new PlayerController(playerBase, playerLabel);
 
             // Initialize AI logic (controller-level, not UI)
             if (isAI)
@@ -67,6 +73,21 @@ namespace CardGame.Testing
             playerController.DrawStartingHand(startingHandSize);
         }
 
+        /// <summary>
+        /// Called at the start of this player's turn to reset per-turn state
+        /// (for example, the normal summon flag).
+        /// </summary>
+        public void ResetTurnState()
+        {
+            if (playerController == null)
+            {
+                Debug.LogWarning("PlayerController is not initialized when resetting turn state.");
+                return;
+            }
+
+            playerController.ResetTurnState();
+        }
+
         public void DrawOneCard()
         {
             if (playerController == null)
@@ -83,6 +104,7 @@ namespace CardGame.Testing
             if (!isAI || playerController == null || aiLogic == null)
                 return;
             PlayerController opponentController = opponent != null ? opponent.playerController : null;
+            Debug.Log($"[AI][{playerLabel}] Handling phase {phase}.");
             aiLogic.HandlePhase(phase, playerController, opponentController);
         }
     }
