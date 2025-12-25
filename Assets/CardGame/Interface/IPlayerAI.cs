@@ -1,7 +1,7 @@
-using CardGame.Controllers;
-using CardGame.Enums;
+using Controllers;
+using Enums;
 
-namespace CardGame.Interfaces
+namespace Interfaces
 {
     public interface IAIPlayer
     {

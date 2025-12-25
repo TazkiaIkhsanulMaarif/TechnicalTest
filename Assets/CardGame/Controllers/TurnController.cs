@@ -1,8 +1,8 @@
 using System;
-using CardGame.Enums;
-using CardGame.Models.Turn;
+using Enums;
+using Models.Turn;
 
-namespace CardGame.Controllers
+namespace Controllers
 {
     public sealed class TurnController
     {

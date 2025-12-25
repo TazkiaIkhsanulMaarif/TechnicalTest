@@ -1,4 +1,4 @@
-namespace CardGame.Enums
+namespace Enums
 {
     public enum TurnPhase
     {

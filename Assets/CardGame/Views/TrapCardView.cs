@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
-using CardGame.Models.Cards;
+using Models.Cards;
 using TMPro;
 using UnityEngine.Events;
 

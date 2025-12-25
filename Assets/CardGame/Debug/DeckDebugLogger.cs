@@ -1,15 +1,10 @@
 using System.Linq;
-using CardGame.Models.Deck;
-using CardGame.Testing;
+using Models.Deck;
+using Testing;
 using UnityEngine;
 
-namespace CardGame.Debugging
+namespace Debugging
 {
-    /// <summary>
-    /// Simple helper MonoBehaviour to log deck data and draw behavior.
-    /// Attach this to a GameObject and assign a DeckTestData.
-    /// This does NOT affect game logic (purely debug / UI side).
-    /// </summary>
     public sealed class DeckDebugLogger : MonoBehaviour
     {
         [Header("Source Deck Data")]
@@ -28,19 +23,17 @@ namespace CardGame.Debugging
 
             Debug.Log("[DeckDebugLogger] --- Deck Debug Start ---");
 
-            // Build a temporary DeckModel just for inspection
             var deckModel = new DeckModel(testDeckData.cards);
 
             Debug.Log($"[DeckDebugLogger] Created deck with {deckModel.Cards.Count} cards.");
-            Debug.Log($"[DeckDebugLogger] Composition -> Monster={deckModel.Cards.Count(c => c.CardType == CardGame.Enums.CardType.Monster)}, " +
-                      $"Spell={deckModel.Cards.Count(c => c.CardType == CardGame.Enums.CardType.Spell)}, " +
-                      $"Trap={deckModel.Cards.Count(c => c.CardType == CardGame.Enums.CardType.Trap)}");
+            Debug.Log($"[DeckDebugLogger] Composition -> Monster={deckModel.Cards.Count(c => c.CardType == Enums.CardType.Monster)}, " +
+                      $"Spell={deckModel.Cards.Count(c => c.CardType == Enums.CardType.Spell)}, " +
+                      $"Trap={deckModel.Cards.Count(c => c.CardType == Enums.CardType.Trap)}");
 
             var initialOrder = string.Join(", ", deckModel.Cards.Select(c => c != null ? c.CardName : "null"));
             Debug.Log($"[DeckDebugLogger] Initial order: {initialOrder}");
 
-            // Use a runtime DeckController to test shuffle + draw
-            var deckController = new CardGame.Controllers.DeckController(deckModel);
+            var deckController = new Controllers.DeckController(deckModel);
 
             var beforeShuffle = string.Join(", ", deckController.Cards.Select(c => c != null ? c.CardName : "null"));
             deckController.Shuffle();
@@ -49,7 +42,6 @@ namespace CardGame.Debugging
             Debug.Log($"[DeckDebugLogger] Before shuffle: {beforeShuffle}");
             Debug.Log($"[DeckDebugLogger] After shuffle:  {afterShuffle}");
 
-            // Draw some cards and log deck count decreasing
             int drawCount = Mathf.Clamp(cardsToDraw, 0, deckController.Count);
             for (int i = 0; i < drawCount; i++)
             {

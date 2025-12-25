@@ -1,7 +1,7 @@
 using UnityEngine;
-using CardGame.Enums;
+using Enums;
 
-namespace CardGame.Models.Cards
+namespace Models.Cards
 {
     public abstract class CardBase : ScriptableObject
     {

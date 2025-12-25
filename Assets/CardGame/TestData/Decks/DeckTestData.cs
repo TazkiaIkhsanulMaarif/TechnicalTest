@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
-using CardGame.Models.Cards;
-using CardGame.Enums;
+using Models.Cards;
+using Enums;
 
-namespace CardGame.Testing
+namespace Testing
 {
     [CreateAssetMenu(
         fileName = "New Test Deck",

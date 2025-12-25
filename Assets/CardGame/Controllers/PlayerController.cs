@@ -1,11 +1,11 @@
 using System;
 using System.Linq;
-using CardGame.Models.Cards;
-using CardGame.Models.Deck;
-using CardGame.Models.Player;
-using CardGame.Enums;
+using Models.Cards;
+using Models.Deck;
+using Models.Player;
+using Enums;
 
-namespace CardGame.Controllers
+namespace Controllers
 {
     public sealed partial class PlayerController
     {
@@ -18,6 +18,7 @@ namespace CardGame.Controllers
 
         public event Action HandChanged;
         public event Action<int> LifePointChanged;
+        public event Action<CardBase> CardDrawn;
         public event Action<CardBase, int, bool> CardPlaced;
         public event Action<int, bool, CardBase> CardRemovedFromField;
         public event Action PlayerDied;
@@ -101,7 +102,6 @@ namespace CardGame.Controllers
 
         private void LogAction(string action, string message)
         {
-            // Example: [ACTION][Player 1.SUMMON] ... or [ACTION][Player 2.ATTACK] ...
             UnityEngine.Debug.Log($"[ACTION][{debugLabel}.{action}] {message}");
         }
 

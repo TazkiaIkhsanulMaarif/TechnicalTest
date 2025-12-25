@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace CardGame.Models.Cards
+namespace Models.Cards
 {
     [System.Serializable]
     public sealed class CardVisual

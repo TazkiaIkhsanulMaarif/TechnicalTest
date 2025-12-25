@@ -5143,6 +5143,7 @@ GameObject:
   - component: {fileID: 2840323213567220090}
   - component: {fileID: 6075867169060632001}
   - component: {fileID: 7763825260076024296}
+  - component: {fileID: 2740534995745020316}
   m_Layer: 5
   m_Name: TrapCard
   m_TagString: Untagged
@@ -5159,7 +5160,7 @@ RectTransform:
   m_GameObject: {fileID: 4890379604619175810}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: -1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4890379605881817000}
@@ -5201,8 +5202,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   DebugMode: 0
-  ScaleValue: -0.593
-  BackVisible: 0
+  ScaleValue: -1
+  BackVisible: 1
 --- !u!225 &2482739067944787669
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -5331,6 +5332,27 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &2740534995745020316
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4890379604619175810}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd088d8e6c92a174aaa7886f59793000, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onClick:
+    m_PersistentCalls:
+      m_Calls: []
+  onSelected:
+    m_PersistentCalls:
+      m_Calls: []
+  onDeselected:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &4890379604787749181
 GameObject:
   m_ObjectHideFlags: 0
@@ -6195,7 +6217,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &4890379605247098301
 RectTransform:
   m_ObjectHideFlags: 0
@@ -6681,7 +6703,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &4890379605881817000
 RectTransform:
   m_ObjectHideFlags: 0

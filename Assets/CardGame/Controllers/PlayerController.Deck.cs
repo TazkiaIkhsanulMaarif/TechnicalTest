@@ -1,11 +1,11 @@
 using System;
 using System.Linq;
-using CardGame.Models.Cards;
-using CardGame.Models.Deck;
-using CardGame.Models.Player;
-using CardGame.Enums;
+using Models.Cards;
+using Models.Deck;
+using Models.Player;
+using Enums;
 
-namespace CardGame.Controllers
+namespace Controllers
 {
     public sealed partial class PlayerController
     {
@@ -29,6 +29,7 @@ namespace CardGame.Controllers
             LogAction("DRAW", $"Drew '{card?.CardName}' | Hand {handBefore}->{handAfter} | Deck {deckBefore}->{deckAfter}");
 
             player.NotifyCardDrawn(card);
+            CardDrawn?.Invoke(card);
             HandChanged?.Invoke();
 
             return card;
@@ -44,14 +45,11 @@ namespace CardGame.Controllers
 
         public void ShuffleDeck()
         {
-            UnityEngine.Debug.Log($"[PlayerController][{debugLabel}] Shuffling deck...");
             var beforeShuffle = string.Join(", ", deckController.Cards.Select(c => c != null ? c.CardName : "null"));
 
             deckController.Shuffle();
 
             var afterShuffle = string.Join(", ", deckController.Cards.Select(c => c != null ? c.CardName : "null"));
-            UnityEngine.Debug.Log($"[PlayerController][{debugLabel}] Before shuffle: {beforeShuffle}");
-            UnityEngine.Debug.Log($"[PlayerController][{debugLabel}] After shuffle:  {afterShuffle}");
         }
     }
 }

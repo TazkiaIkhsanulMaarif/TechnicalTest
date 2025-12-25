@@ -1,11 +1,11 @@
-using CardGame.Controllers;
-using CardGame.Enums;
-using CardGame.Models.Turn;
-using CardGame.Testing;
+using Controllers;
+using Enums;
+using Models.Turn;
+using Testing;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace CardGame.Views
+namespace Views
 {
     public sealed class TurnView : MonoBehaviour
     {
@@ -23,7 +23,7 @@ namespace CardGame.Views
         [SerializeField] private UnityEvent<int> onTurnSwitched;
 
         [Header("Player Decks (index = player index)")]
-        [SerializeField] private CardGame.Testing.GameManager[] playerDecks;
+        [SerializeField] private Testing.GameManager[] playerDecks;
 
         private TurnController controller;
 
@@ -162,7 +162,6 @@ namespace CardGame.Views
             if (current == null || !current.IsAI)
                 return;
 
-            // Simple 2-player assumption: opponent is the next index in the array
             GameManager opponent = null;
             if (playerDecks.Length > 1)
             {

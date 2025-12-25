@@ -1,11 +1,11 @@
 using System;
 using System.Linq;
-using CardGame.Models.Cards;
-using CardGame.Models.Deck;
-using CardGame.Models.Player;
-using CardGame.Enums;
+using Models.Cards;
+using Models.Deck;
+using Models.Player;
+using Enums;
 
-namespace CardGame.Controllers
+namespace Controllers
 {
     public sealed partial class PlayerController
     {
@@ -76,6 +76,46 @@ namespace CardGame.Controllers
             int monstersOnFieldAfter = model.MonsterField.Count(c => c != null);
 
             LogAction("SUMMON", $"Summoned '{monster.CardName}' (Level {monster.Level}) to slot {emptyMonsterSlot} | Hand {handBefore}->{handAfter} | MonstersOnField {monstersOnFieldBefore}->{monstersOnFieldAfter}");
+
+            return true;
+        }
+        public bool SummonMonsterToSlot(MonsterCard monster, int slotIndex)
+        {
+            if (monster == null)
+                throw new ArgumentNullException(nameof(monster));
+
+            var model = player.Model;
+
+            int handBefore = model.Hand.Count;
+            int monstersOnFieldBefore = model.MonsterField.Count(c => c != null);
+
+            if (model.HasSummonedThisTurn)
+            {
+                LogAction("SUMMON", $"Failed to summon '{monster.CardName}' to slot {slotIndex}: already summoned this turn.");
+                return false;
+            }
+
+            if (monster.Level > 4)
+            {
+                LogAction("SUMMON", $"Failed to summon '{monster.CardName}' to slot {slotIndex}: level {monster.Level} > 4.");
+                return false;
+            }
+
+            if (!IsMonsterInHand(model, monster))
+            {
+                LogAction("SUMMON", $"Failed to summon '{monster.CardName}' to slot {slotIndex}: monster not in hand.");
+                return false;
+            }
+
+            ValidateEmptySlot(model.MonsterField, slotIndex);
+            PlayCard(monster, slotIndex);
+
+            model.MarkSummonedThisTurn();
+
+            int handAfter = model.Hand.Count;
+            int monstersOnFieldAfter = model.MonsterField.Count(c => c != null);
+
+            LogAction("SUMMON", $"Summoned '{monster.CardName}' (Level {monster.Level}) to slot {slotIndex} | Hand {handBefore}->{handAfter} | MonstersOnField {monstersOnFieldBefore}->{monstersOnFieldAfter}");
 
             return true;
         }

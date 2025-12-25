@@ -1,6 +1,6 @@
 
 
-namespace CardGame.Enums
+namespace Enums
 {
     public enum CardType
     {

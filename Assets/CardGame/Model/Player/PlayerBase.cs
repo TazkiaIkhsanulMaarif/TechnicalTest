@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using CardGame.Models.Cards;
+using Models.Cards;
 
-namespace CardGame.Models.Player
+namespace Models.Player
 {
     public abstract class PlayerBase
     {

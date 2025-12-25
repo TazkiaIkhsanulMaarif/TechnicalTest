@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
-using CardGame.Interfaces;
-using CardGame.Models.Cards;
-using CardGame.Models.Deck;
+using Interfaces;
+using Models.Cards;
+using Models.Deck;
 
-namespace CardGame.Controllers
+namespace Controllers
 {
     public sealed class DeckController : IDeck
     {

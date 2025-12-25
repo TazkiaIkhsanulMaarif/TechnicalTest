@@ -1,7 +1,7 @@
 using System;
-using CardGame.Enums;
+using Enums;
 
-namespace CardGame.Models.Turn
+namespace Models.Turn
 {
     [Serializable]
     public sealed class TurnModel

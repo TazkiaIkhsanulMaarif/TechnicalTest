@@ -1,22 +1,17 @@
 using System.Collections;
-using CardGame.Controllers;
-using CardGame.Enums;
-using CardGame.Testing;
-using CardGame.Views;
+using Controllers;
+using Enums;
+using Testing;
+using Views;
 using UnityEngine;
 
-namespace CardGame.Debugging
+namespace Debugging
 {
-    /// <summary>
-    /// Automatically advances phases in TurnView to play a full match without user input.
-    /// Relies on existing AI (SimplePhaseAI) and game rules.
-    /// Attach this to a GameObject, assign TurnView and GameManagers.
-    /// </summary>
     public sealed class AutoPlayMatch : MonoBehaviour
     {
         [Header("Core")]
         [SerializeField] private TurnView turnView;
-        [SerializeField] private GameManager[] players; // index 0 = Player 1, 1 = Player 2, etc.
+        [SerializeField] private GameManager[] players;
 
         [Header("Timing")]
         [SerializeField] private float phaseDelaySeconds = 1.0f;
@@ -44,21 +39,16 @@ namespace CardGame.Debugging
         {
             isRunning = true;
             Debug.Log("[AutoPlayMatch] Auto-play match started.");
-
-            // small delay to let game initialize
             yield return new WaitForSeconds(phaseDelaySeconds);
 
             while (isRunning)
             {
-                // Check for winner
                 int winnerIndex = GetWinnerIndex();
                 if (winnerIndex >= 0)
                 {
                     Debug.Log($"[AutoPlayMatch] Match finished. Winner: {players[winnerIndex].PlayerLabel}.");
                     yield break;
                 }
-
-                // Advance to next phase
                 turnView.NextPhase();
 
                 yield return new WaitForSeconds(phaseDelaySeconds);
@@ -86,8 +76,6 @@ namespace CardGame.Debugging
                     lastAliveIndex = i;
                 }
             }
-
-            // If exactly one alive, declare winner
             if (aliveCount == 1)
             {
                 return lastAliveIndex;

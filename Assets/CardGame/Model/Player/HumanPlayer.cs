@@ -1,6 +1,6 @@
-using CardGame.Models.Cards;
+using Models.Cards;
 
-namespace CardGame.Models.Player
+namespace Models.Player
 {
     public sealed class HumanPlayer : PlayerBase
     {

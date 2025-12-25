@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using CardGame.Enums;
-using CardGame.Models.Cards;
+using Enums;
+using Models.Cards;
 
-namespace CardGame.Models.Deck
+namespace Models.Deck
 {
     [Serializable]
     public sealed class DeckModel

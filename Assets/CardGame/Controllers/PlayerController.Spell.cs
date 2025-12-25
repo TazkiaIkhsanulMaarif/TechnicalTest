@@ -1,13 +1,12 @@
 using System;
-using CardGame.Models.Cards;
-using CardGame.Models.Player;
-using CardGame.Enums;
+using Models.Cards;
+using Models.Player;
+using Enums;
 
-namespace CardGame.Controllers
+namespace Controllers
 {
     public sealed partial class PlayerController
     {
-        // SPELL EFFECT HELPERS
         public void ApplySpellToMonster(SpellCard spell, PlayerController targetPlayer, int targetSlotIndex)
         {
             if (spell == null) throw new ArgumentNullException(nameof(spell));

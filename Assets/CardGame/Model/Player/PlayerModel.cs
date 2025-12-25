@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using CardGame.Models.Cards;
-using CardGame.Models.Deck;
+using Models.Cards;
+using Models.Deck;
 
-namespace CardGame.Models.Player
+namespace Models.Player
 {
     [Serializable]
     public sealed class PlayerModel

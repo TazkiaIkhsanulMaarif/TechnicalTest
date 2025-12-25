@@ -1,7 +1,7 @@
 using UnityEngine;
-using CardGame.Enums;
+using Enums;
 
-namespace CardGame.Models.Cards
+namespace Models.Cards
 {
     [CreateAssetMenu(
         fileName = "New Monster Card",
@@ -24,7 +24,6 @@ namespace CardGame.Models.Cards
 
         private void OnEnable()
         {
-            // enforce type safety
             typeof(CardBase)
                 .GetField("cardType",
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)

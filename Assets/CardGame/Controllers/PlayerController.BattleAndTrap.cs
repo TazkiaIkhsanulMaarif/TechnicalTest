@@ -1,9 +1,9 @@
 using System;
-using CardGame.Models.Cards;
-using CardGame.Models.Player;
-using CardGame.Enums;
+using Models.Cards;
+using Models.Player;
+using Enums;
 
-namespace CardGame.Controllers
+namespace Controllers
 {
     public sealed partial class PlayerController
     {
@@ -76,7 +76,6 @@ namespace CardGame.Controllers
             switch (trap.EffectType)
             {
                 case TrapEffectType.DamageAttacker:
-                    // Deal fixed damage to attacking player
                     {
                         int damage = value > 0 ? value : 100;
                         int before = attacker.player.Model.LifePoint;
@@ -87,19 +86,16 @@ namespace CardGame.Controllers
                     break;
 
                 case TrapEffectType.ReduceIncomingDamage:
-                    // Prevent the next battle damage dealt to the defender this battle
                     defender.player.Model.EnableBattleDamageImmunity();
                     LogAction("TRAP", $"Trap '{trap.CardName}' prevents the next battle damage to defender {defender.debugLabel}.");
                     break;
 
                 case TrapEffectType.DebuffSummonedMonster:
-                    // Debuff current attacking monster's ATK by X%
                     ApplyAttackDebuffToCurrentAttacker(attacker, value);
                     LogAction("TRAP", $"Trap '{trap.CardName}' debuffs attacking monster ATK by {value}% on {attacker.debugLabel}.");
                     break;
 
                 case TrapEffectType.NegateSpell:
-                    // Negate next spell activation targeting this player (hook to be used when spell system is extended)
                     LogAction("TRAP", $"Trap '{trap.CardName}' is configured to negate spells but requires a spell-activation hook.");
                     break;
 
@@ -153,19 +149,13 @@ namespace CardGame.Controllers
 
             if (attackValue > defenseValue)
             {
-                int damage = attackValue - defenseValue;
                 RemoveMonsterFromField(opponentModel, targetSlot);
-                ApplyBattleDamage(opponent, damage);
-                int opponentLPAfter = opponentModel.LifePoint;
-
-                LogAction("BATTLE", $"'{attacker.CardName}' ATK {attackValue} vs '{defender.CardName}' DEF {defenseValue} | Defender destroyed | Opponent LP {opponentLPBefore}->{opponentLPAfter} (damage {damage})");
+                LogAction("BATTLE", $"'{attacker.CardName}' ATK {attackValue} vs '{defender.CardName}' DEF {defenseValue} | Defender destroyed | No LP damage");
             }
             else if (attackValue < defenseValue)
             {
                 RemoveMonsterFromField(selfModel, attackerSlot);
                 LogAction("BATTLE", $"'{attacker.CardName}' ATK {attackValue} vs '{defender.CardName}' DEF {defenseValue} | Attacker destroyed | No LP damage");
-
-                // Defender survives being attacked: its DEF takes damage equal to the attacker's ATK
                 opponentModel.ApplyDefenseDamage(targetSlot, attackValue);
                 int newDefense = opponentModel.GetEffectiveDefenseAt(targetSlot);
                 LogAction("BATTLE", $"Defender '{defender.CardName}' DEF reduced by {attackValue} from this attack | New effective DEF = {newDefense}.");
@@ -180,8 +170,6 @@ namespace CardGame.Controllers
 
             selfModel.MarkMonsterAttackedThisTurn(attackerSlot);
         }
-
-        // Note: direct defense damage is applied inside ResolveMonsterBattle via ApplyDefenseDamage and GetEffectiveDefenseAt.
 
         private void ApplyBattleDamage(PlayerController target, int damage)
         {

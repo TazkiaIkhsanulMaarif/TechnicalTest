@@ -1,25 +1,20 @@
 using System.Linq;
-using CardGame.Controllers;
-using CardGame.Enums;
-using CardGame.Models.Cards;
-using CardGame.Models.Player;
-using CardGame.Testing;
-using CardGame.Views;
+using Controllers;
+using Enums;
+using Models.Cards;
+using Models.Player;
+using Testing;
+using Views;
+using Actions;
 using UnityEngine;
 
-namespace CardGame.Debugging
+namespace Debugging
 {
-    /// <summary>
-    /// Simple debug helper to manually trigger actions via UI buttons:
-    /// - Summon first monster in hand (respecting Summon rules handled by PlayerController)
-    /// - Attack automatically with strongest monster (like SimplePhaseAI)
-    /// Attach this to a GameObject and wire public methods to UI Buttons.
-    /// </summary>
     public sealed class ActionDebugTester : MonoBehaviour
     {
         [Header("Players")]
-        [SerializeField] private GameManager playerManager;      // self
-        [SerializeField] private GameManager opponentManager;    // opponent
+        [SerializeField] private GameManager playerManager;
+        [SerializeField] private GameManager opponentManager;
 
         [Header("Optional Turn View (for phase checks)")]
         [SerializeField] private TurnView turnView;
@@ -27,8 +22,6 @@ namespace CardGame.Debugging
         private PlayerController PlayerController => playerManager != null ? playerManager.Controller : null;
         private PlayerController OpponentController => opponentManager != null ? opponentManager.Controller : null;
         private string PlayerLabel => playerManager != null ? playerManager.PlayerLabel : "Player";
-
-        // Call from a UI Button to try summoning the first monster in hand
         public void DebugSummonFirstMonsterInHand()
         {
             var controller = PlayerController;
@@ -54,10 +47,6 @@ namespace CardGame.Debugging
             );
         }
 
-        // Call from a UI Button to perform an automatic attack:
-        // - Pick strongest own monster (highest ATK) as attacker
-        // - If opponent has monsters: target weakest enemy monster (lowest ATK)
-        // - If opponent has no monsters: direct attack (targetSlot = 0)
         public void DebugAttackWithStrongestMonster()
         {
             var selfController = PlayerController;
@@ -69,7 +58,6 @@ namespace CardGame.Debugging
                 return;
             }
 
-            // Optional phase check
             if (turnView != null && turnView.CurrentPhase != TurnPhase.Battle)
             {
                 Debug.LogWarning($"[ActionDebugTester][{PlayerLabel}] Current phase is {turnView.CurrentPhase}, expected Battle for attacks.");
@@ -78,7 +66,6 @@ namespace CardGame.Debugging
             PlayerModel selfModel = selfController.Player.Model;
             PlayerModel opponentModel = opponentController.Player.Model;
 
-            // Pick attacker: own monster with highest ATK
             int attackerSlot = -1;
             MonsterCard attackerCard = null;
 
@@ -100,7 +87,6 @@ namespace CardGame.Debugging
                 return;
             }
 
-            // Determine target
             int targetSlot = -1;
             MonsterCard weakestDefender = null;
 
@@ -118,18 +104,48 @@ namespace CardGame.Debugging
 
             if (weakestDefender == null)
             {
-                // No enemy monsters: direct attack to index 0
                 targetSlot = 0;
             }
 
             try
             {
-                selfController.AttackWithMonster(attackerSlot, targetSlot, opponentController);
+                if (GameActionQueueRunner.Instance != null
+                    && playerManager != null
+                    && opponentManager != null
+                    && playerManager.PlayerView != null
+                    && opponentManager.PlayerView != null)
+                {
+                    var selfView = playerManager.PlayerView;
+                    var opponentView = opponentManager.PlayerView;
+
+                    Transform attackerTransform = selfView.GetMonsterCardTransformAt(attackerSlot);
+                    Transform targetTransform = null;
+
+                    if (weakestDefender != null)
+                    {
+                        targetTransform = opponentView.GetMonsterCardTransformAt(targetSlot);
+                    }
+
+                    var action = new MonsterAttackAction(
+                        selfController,
+                        opponentController,
+                        attackerSlot,
+                        targetSlot,
+                        attackerTransform,
+                        targetTransform);
+
+                    GameActionQueueRunner.Instance.Queue.Enqueue(action);
+                }
+                else
+                {
+                    selfController.AttackWithMonster(attackerSlot, targetSlot, opponentController);
+                }
+
                 Debug.Log($"[ActionDebugTester][{PlayerLabel}] Attack request: attackerSlot={attackerSlot}, targetSlot={targetSlot} (see [ACTION][{PlayerLabel}.BATTLE] logs for details).");
             }
             catch (System.Exception ex)
             {
-                Debug.LogError($"[ActionDebugTester][{PlayerLabel}] Error when calling AttackWithMonster: {ex.Message}");
+                Debug.LogError($"[ActionDebugTester][{PlayerLabel}] Error when calling AttackWithMonster/MonsterAttackAction: {ex.Message}");
             }
         }
     }
